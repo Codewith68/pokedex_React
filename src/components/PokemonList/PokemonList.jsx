@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
+import { Link } from 'react-router-dom'
 
 const PAGE_SIZE = 20
 
@@ -69,21 +70,23 @@ function PokemonList() {
           <div className='grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'>
             {pokemonList.map((pokemon,index)=>{
               return (
-                <article key={index} className='rounded-xl border-b-gray-800 border-2 bg-black p-4 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-lg'>
-                  <div className='mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100'>
-                    <img src={pokemon.image} alt={pokemon.name} className='h-[50px] w-[50px] object-contain'/>
-                  </div>
-                  <h3 className='mt-3 text-base font-bold capitalize text-white'>{pokemon.name}</h3>
-                  <div className='mt-3 flex flex-wrap items-center justify-center gap-2'>
-                    {pokemon.types.map((type)=>{
-                      return (
-                        <span key={`${pokemon.name}-${type}`} className='rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold capitalize text-emerald-700'>
-                          {type}
-                        </span>
-                      )
-                    })}
-                  </div>
-                </article>
+                <Link key={index} to={`/pokemon/${pokemon.name}`} className='block'>
+                  <article className='rounded-xl border-b-gray-800 border-2 bg-black p-4 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-lg'>
+                    <div className='mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100'>
+                      <img src={pokemon.image} alt={pokemon.name} className='h-12.5 w-12.5 object-contain'/>
+                    </div>
+                    <h3 className='mt-3 text-base font-bold capitalize text-white hover:text-emerald-300'>{pokemon.name}</h3>
+                    <div className='mt-3 flex flex-wrap items-center justify-center gap-2'>
+                      {pokemon.types.map((type)=>{
+                        return (
+                          <span key={`${pokemon.name}-${type}`} className='rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold capitalize text-emerald-700'>
+                            {type}
+                          </span>
+                        )
+                      })}
+                    </div>
+                  </article>
+                </Link>
               )
             })}
           </div>
