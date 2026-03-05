@@ -2,15 +2,15 @@
 function Search() {
 
   return (
-    <>
-       <div className="w-125 mx-auto my-0 text-center text-2xl">
-         <input
-        className="w-full p-4"
-        type="text"
-        placeholder="pokemon name"
+    <div className="mx-auto mb-8 w-full max-w-2xl">
+      <div className="  border-slate-200 bg-white p-2 shadow-sm">
+        <input
+          className="w-full rounded-xl border-none bg-slate-50 px-4 py-3 text-base text-slate-800 placeholder:text-slate-400 focus:bg-white focus:outline-none"
+          type="text"
+          placeholder="Search pokemon name..."
         />
-       </div>
-    </>
+      </div>
+    </div>
   )
 }
 
