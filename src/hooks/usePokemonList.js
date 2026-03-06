@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import downloadPokemons from "../utils/downloadPokemons";
+import useDebounce from "./useDebounce";
+import { fetchPokemonByIdOrName, mapPokemonCard } from "../utils/pokemonApi";
 
 function getOffsetFromUrl(url) {
   try {
@@ -10,7 +12,10 @@ function getOffsetFromUrl(url) {
   }
 }
 
-function usePokemonList(defaultUrl, pageSize = 20) {
+function usePokemonList(defaultUrl, pageSize = 20, searchTerm = "") {
+  const debouncedSearchTerm = useDebounce(searchTerm, 1000);
+  const normalizedSearchTerm = debouncedSearchTerm.trim().toLowerCase();
+
   const [pokemonListState, setPokemonListState] = useState({
     pokemonList: [],
     pokedexUrl: defaultUrl,
@@ -28,6 +33,22 @@ function usePokemonList(defaultUrl, pageSize = 20) {
       try {
         setIsLoading(true);
         setError("");
+
+        if (normalizedSearchTerm) {
+          const pokemonData = await fetchPokemonByIdOrName(normalizedSearchTerm);
+
+          if (ignore) return;
+
+          setPokemonListState((prev) => ({
+            ...prev,
+            pokemonList: [mapPokemonCard(pokemonData)],
+            nextUrl: "",
+            prevUrl: "",
+            totalCount: 1,
+          }));
+          return;
+        }
+
         const data = await downloadPokemons(
           pokemonListState.pokedexUrl || defaultUrl,
           pageSize
@@ -44,7 +65,11 @@ function usePokemonList(defaultUrl, pageSize = 20) {
         }));
       } catch {
         if (!ignore) {
-          setError("Unable to fetch Pokemon list.");
+          setError(
+            normalizedSearchTerm
+              ? `No pokemon found for "${normalizedSearchTerm}".`
+              : "Unable to fetch Pokemon list."
+          );
           setPokemonListState((prev) => ({ ...prev, pokemonList: [] }));
         }
       } finally {
@@ -59,7 +84,7 @@ function usePokemonList(defaultUrl, pageSize = 20) {
     return () => {
       ignore = true;
     };
-  }, [defaultUrl, pageSize, pokemonListState.pokedexUrl]);
+  }, [defaultUrl, normalizedSearchTerm, pageSize, pokemonListState.pokedexUrl]);
 
   const pageInfo = useMemo(() => {
     const offset = getOffsetFromUrl(pokemonListState.pokedexUrl || defaultUrl);
@@ -95,6 +120,7 @@ function usePokemonList(defaultUrl, pageSize = 20) {
     pageInfo,
     canGoNext: Boolean(pokemonListState.nextUrl),
     canGoPrev: Boolean(pokemonListState.prevUrl),
+    isSearchMode: Boolean(normalizedSearchTerm),
     goToNextPage,
     goToPrevPage,
     setPokemonListState,

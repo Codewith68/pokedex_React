@@ -3,7 +3,7 @@ import usePokemonList from '../../hooks/usePokemonList'
 
 const DEFAULT_URL = 'https://pokeapi.co/api/v2/pokemon?limit=20&offset=0'
 
-function PokemonList() {
+function PokemonList({ searchTerm }) {
     const {
       pokemonListState,
       isLoading,
@@ -11,14 +11,17 @@ function PokemonList() {
       pageInfo,
       canGoPrev,
       canGoNext,
+      isSearchMode,
       goToPrevPage,
       goToNextPage,
-    } = usePokemonList(DEFAULT_URL, 20)
+    } = usePokemonList(DEFAULT_URL, 20, searchTerm)
 
   return (
     <div className='mx-auto w-full max-w-6xl'>
       <div className='mb-6 text-center'>
-        <h2 className='text-xl font-bold text-slate-800 md:text-2xl'>List of all Pokemons</h2>
+        <h2 className='text-xl font-bold text-slate-800 md:text-2xl'>
+          {isSearchMode ? 'Search Results' : 'List of all Pokemons'}
+        </h2>
         <p className='mt-1 text-sm text-slate-500'>
           Showing {pageInfo.start} - {pageInfo.end} of {pageInfo.total}
         </p>
@@ -27,7 +30,7 @@ function PokemonList() {
       {isLoading ? (
         <p className='rounded-xl bg-black p-6 text-center text-lg font-medium text-white shadow-sm'>Loading...</p>
       ) : error ? (
-        <p className='rounded-xl bg-red-100 p-6 text-center text-lg font-medium text-red-700 shadow-sm'>{error}</p>
+        <p className='rounded-xl bg-red-100 p-6 text-center text-lg font-medium text-red-500 shadow-sm'>{error}</p>
       ) : (
         <>
           <div className='grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'>
@@ -54,24 +57,26 @@ function PokemonList() {
             })}
           </div>
 
-          <div className='mt-8 flex items-center justify-center gap-3'>
-            <button
-              type='button'
-              onClick={goToPrevPage}
-              disabled={!canGoPrev}
-              className=' bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-300'
-            >
-              Prev
-            </button>
-            <button
-              type='button'
-              onClick={goToNextPage}
-              disabled={!canGoNext}
-              className=' bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:bg-emerald-200'
-            >
-              Next
-            </button>
-          </div>
+          {!isSearchMode && (
+            <div className='mt-8 flex items-center justify-center gap-3'>
+              <button
+                type='button'
+                onClick={goToPrevPage}
+                disabled={!canGoPrev}
+                className=' bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-300'
+              >
+                Prev
+              </button>
+              <button
+                type='button'
+                onClick={goToNextPage}
+                disabled={!canGoNext}
+                className=' bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:bg-emerald-200'
+              >
+                Next
+              </button>
+            </div>
+          )}
         </>
       )}
     </div>
