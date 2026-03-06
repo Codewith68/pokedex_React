@@ -1,67 +1,13 @@
-import React, { useEffect, useState } from 'react'
-import axios from 'axios'
-import { Link, useParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import usePokemon from '../../hooks/usePokemon'
 
 function PokemonDetails() {
-  const { id } = useParams()
-  const [pokemon, setPokemon] = useState(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState('')
-
-  useEffect(() => {
-    let ignore = false
-
-    const fetchPokemonDetails = async () => {
-      try {
-        setIsLoading(true)
-        setError('')
-        const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${id.toLowerCase()}`)
-
-        if (ignore) return
-
-        const data = response.data
-        const sprites = data.sprites
-        const image =
-          sprites.other?.['official-artwork']?.front_default ||
-          sprites.other?.dream_world?.front_default ||
-          sprites.front_default
-
-        setPokemon({
-          id: data.id,
-          name: data.name,
-          image,
-          height: data.height,
-          weight: data.weight,
-          types: data.types.map((type) => type.type.name),
-          abilities: data.abilities.map((ability) => ability.ability.name),
-          stats: data.stats.map((stat) => ({
-            name: stat.stat.name,
-            value: stat.base_stat,
-          })),
-        })
-      } catch {
-        if (!ignore) {
-          setError('Pokemon not found.')
-          setPokemon(null)
-        }
-      } finally {
-        if (!ignore) {
-          setIsLoading(false)
-        }
-      }
-    }
-
-    fetchPokemonDetails()
-
-    return () => {
-      ignore = true
-    }
-  }, [id])
+  const { pokemon, pokemonListState, isLoading, error } = usePokemon()
 
   return (
     <div className='mx-auto mt-10 w-full max-w-3xl rounded-xl bg-black p-8 text-white shadow-lg'>
       <Link to='/' className='inline-block rounded bg-emerald-500 px-4 py-2 font-semibold text-black'>
-        Back to Home
+             BACK TO POKEDEX OR HOME
       </Link>
 
       {isLoading ? (
@@ -102,6 +48,24 @@ function PokemonDetails() {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+
+          <div className='mt-8'>
+            <h3 className='mb-3 text-lg font-semibold'>More {pokemon.types[0]} Type Pokemons</h3>
+            <div className='flex flex-wrap gap-2'>
+              {pokemonListState.pokemonList
+                .filter((relatedPokemon) => relatedPokemon.name !== pokemon.name)
+                .slice(0, 12)
+                .map((relatedPokemon) => (
+                  <Link
+                    key={relatedPokemon.id}
+                    to={`/pokemon/${relatedPokemon.name}`}
+                    className='rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold capitalize text-emerald-700'
+                  >
+                    {relatedPokemon.name}
+                  </Link>
+                ))}
             </div>
           </div>
         </div>

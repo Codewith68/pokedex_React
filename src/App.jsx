@@ -10,7 +10,7 @@ function App() {
     <>
       <header className='mx-auto flex w-full max-w-6xl items-center justify-center gap-3 px-4 py-4'>
         <NavLink to='/' className={getNavClass}>
-          Home
+            POKEDEX
         </NavLink>
       </header>
       <CustomRoutes />
